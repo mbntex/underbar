@@ -318,9 +318,15 @@ _.reduce = function(collection, iterator, accumulator) {
   // _.memoize should return a function that, when called, will check if it has
   // already computed the result for the given argument and return that value
   // instead if possible.
-  _.memoize = function(func) {
-    var past = {};
-    
+   _.memoize = function(func) {
+    var info = {};
+    return function() {
+      var arg = JSON.stringify(arguments);
+      if (!info[arg]) {
+        info[arg] = func.apply(this, arguments);
+      }
+      return info[arg];
+    };
   };
 
   // Delays a function for the given number of milliseconds, and then calls
@@ -329,10 +335,11 @@ _.reduce = function(collection, iterator, accumulator) {
   // The arguments for the original function are passed after the wait
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
-  _.delay = function(func, wait) {
-    setTimeout(function(){func()}, wait);
-    //add vaiables form argument array to this for .call()
+ _.delay = function(func, wait) {
+    var args = Array.prototype.slice.call(arguments, 2);
+    setTimeout(function() { func.apply(this, args); }, wait);
   };
+
 
 
   /**
